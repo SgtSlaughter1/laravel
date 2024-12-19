@@ -3,6 +3,7 @@
         <h1>Edit Trainee</h1>
 
         <div v-if="loading" class="text-center">
+            <Spinner />
             <p>Loading trainee details...</p>
         </div>
 
@@ -31,8 +32,12 @@
 
 <script>
 import api from '@/services/api'; 
+import Spinner from '@/components/Spinner.vue';
 
 export default {
+    components: {
+        Spinner,
+    },
     data() {
         return {
             trainee: {
