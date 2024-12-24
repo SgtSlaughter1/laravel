@@ -22,6 +22,21 @@
                 </div>
             </li>
         </ul>
+
+        <!-- Add Pagination Controls -->
+        <nav v-if="totalPages > 1" aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li :class="['page-item', { disabled: currentPage === 1 }]">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+                </li>
+                <li v-for="page in totalPages" :key="page" :class="['page-item', { active: page === currentPage }]">
+                    <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li :class="['page-item', { disabled: currentPage === totalPages }]">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </template>
 
@@ -36,17 +51,27 @@ export default {
         return {
             trainees: [],
             loading: true,
+            currentPage: 1,
+            totalPages: 0,
         };
     },
     methods: {
-        async getTrainees() {
+        async getTrainees(page = 1) {
             try {
-                const response = await api.getTrainees();
+                this.loading = true;
+                const response = await api.getTrainees({ page });
                 this.trainees = response.data.data.data;
+                this.currentPage = response.data.data.current_page;
+                this.totalPages = response.data.data.last_page;
             } catch (error) {
                 console.error(error);
             } finally {
                 this.loading = false;
+            }
+        },
+        changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.getTrainees(page);
             }
         },
     },
